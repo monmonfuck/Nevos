@@ -1502,8 +1502,10 @@
                     aria-haspopup="true" aria-expanded="false" aria-controls="workspace-orbit-menu"
                     title="Tap to lock immediately · Hold or hover for quick actions">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z"></path>
+                <path d="M8.5 15.5V8.5l7 7V8.5"></path>
               </svg>
+              <!-- Thẻ vòng trên ////////////////////-->
             </button>
             <div class="workspace-orbit-menu" id="workspace-orbit-menu" role="group" aria-label="Vault quick actions">
               <button type="button" class="orbit-action" data-action="settings" onclick="runWorkspaceOrbitAction('settings', event)" title="Settings" aria-label="Settings">
@@ -1559,38 +1561,38 @@
         <main class="editor-pane glass-panel">
           <div class="empty-state" id="empty-state" style="-webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">
             <button type="button" class="empty-state-logo" onclick="openNoteFromEmptyState()"
-                    aria-label="Open the first note or create a new note" title="Open a note or create your first note">
+                    aria-label="Version 3.2.2" title="Version 3.2.2">
             <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
-                <!-- Dải màu Cyan - Blue - Purple hiện đại -->
-                <linearGradient id="nevos-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <!-- Dải màu Cyan - Blue - Purple đồng bộ hệ thống -->
+                <linearGradient id="nevos-hex-grad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stop-color="#00F2FE" />
                   <stop offset="50%" stop-color="#3B82F6" />
                   <stop offset="100%" stop-color="#9333EA" />
                 </linearGradient>
               </defs>
 
-              <!-- Quai ổ khóa (Mã hóa) -->
-              <path d="M 72 62 V 44 C 72 28.5 128 28.5 128 44 V 62" 
-                    stroke="url(#nevos-grad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- 1. Quai ổ khóa phía trên (Mã hóa / Security Shackle) -->
+              <path d="M 76 58 V 40 C 76 26 124 26 124 40 V 58" 
+                    stroke="url(#nevos-hex-grad)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
 
-              <!-- Khung sổ Note -->
-              <rect x="35" y="62" width="130" height="110" rx="20" 
-                    stroke="url(#nevos-grad)" stroke-width="12" fill="none"/>
+              <!-- 2. Khung Lục Giác Công Nghệ (Futuristic Hexagon) -->
+              <path d="M 100 58 L 152 88 L 152 148 L 100 178 L 48 148 L 48 88 Z" 
+                    stroke="url(#nevos-hex-grad)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 
-              <!-- Chữ N (Nevos) -->
-              <path d="M 65 142 V 92 L 108 142 V 92" 
-                    stroke="url(#nevos-grad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- 3. Chữ N công nghệ nằm ở trung tâm Lục Giác -->
+              <path d="M 76 138 V 98 L 124 138 V 98" 
+                    stroke="url(#nevos-hex-grad)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
 
-              <!-- Khiên bảo mật góc phải -->
-              <path d="M 135 105 L 148 111 V 122 C 148 130 135 135 135 135 C 135 135 122 130 122 122 V 111 Z" 
-                    fill="url(#nevos-grad)"/>
-              <!-- Lỗ khóa trên khiên -->
-              <circle cx="135" cy="117" r="2.2" fill="#0F172A"/>
-              <path d="M 134 118 L 133.5 124 H 136.5 L 136 118 Z" fill="#0F172A"/>
+              <!-- 4. Khiên bảo mật góc phải bên dưới -->
+              <path d="M 142 125 L 155 131 V 142 C 155 150 142 155 142 155 C 142 155 129 150 129 142 V 131 Z" 
+                    fill="url(#nevos-hex-grad)"/>
+
+              <!-- Lỗ khóa chi tiết bên trong khiên -->
+              <circle cx="142" cy="137" r="2.2" fill="#0F172A"/>
+              <path d="M 141 138 L 140.5 144 H 143.5 L 143 138 Z" fill="#0F172A"/>
             </svg>
             </button>
-
             <p>Copyright © MBC. All rights reserved.</p>
           </div>
 
