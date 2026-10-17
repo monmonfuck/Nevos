@@ -186,17 +186,41 @@
     .note-drag-ghost.compact { width: 44px !important; height: 44px !important; padding: 5px; border-radius: 50%; justify-content: center; }
     .note-drag-ghost.compact .note-card-info { display: none; }
     .note-drag-ghost.compact .note-card-icon { width: 32px; height: 32px; border-radius: 50%; }
-    #note-action-dot { position: fixed; right: 22px; bottom: 22px; z-index: 12020; width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(255,255,255,.75); background: rgba(255,255,255,.6); box-shadow: 0 0 0 5px rgba(255,255,255,.07), 0 4px 16px rgba(0,0,0,.45); cursor: pointer; padding: 0; transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
-    #note-action-dot:hover, #note-action-dot.open, #note-action-dot.drag-over { transform: scale(1.25); background: var(--accent); border-color: #fff; box-shadow: 0 0 0 8px rgba(10,132,255,.16), 0 4px 18px rgba(0,0,0,.5); }
+    /* The lower action rail is positioned by the active note row, never by the viewport corner. */
+    #note-action-dot {
+      position: fixed; left: 0; top: 0; right: auto; bottom: auto; z-index: 12020;
+      width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(255,255,255,.75);
+      background: rgba(255,255,255,.6); box-shadow: 0 0 0 5px rgba(255,255,255,.07), 0 4px 16px rgba(0,0,0,.45);
+      cursor: pointer; padding: 0; opacity: 0; visibility: hidden; pointer-events: none;
+      transform: translate(-50%,-50%) scale(.55);
+      transition: opacity .18s ease, transform .24s cubic-bezier(.16,1,.3,1), visibility 0s linear .24s,
+                  background .2s ease, box-shadow .2s ease;
+    }
+    #note-action-dot.is-visible {
+      opacity: 1; visibility: visible; pointer-events: auto;
+      transform: translate(-50%,-50%) scale(1); transition-delay: 0s;
+    }
+    #note-action-dot:hover, #note-action-dot.open, #note-action-dot.drag-over {
+      transform: translate(-50%,-50%) scale(1.25); background: var(--accent); border-color: #fff;
+      box-shadow: 0 0 0 8px rgba(10,132,255,.16), 0 4px 18px rgba(0,0,0,.5);
+    }
     #note-action-wheel { position: fixed; inset: 0; z-index: 12010; pointer-events: none; }
     #note-action-wheel.show { pointer-events: none; }
-    .note-action-item { position: fixed; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid rgba(255,255,255,.2); color: var(--text-main); background: rgba(18,20,30,.96); box-shadow: 0 10px 26px rgba(0,0,0,.5); cursor: pointer; pointer-events: auto; opacity: 0; transform: translate(-50%,-50%) scale(.3); transition: opacity .18s ease, transform .22s cubic-bezier(.16,1,.3,1), background .18s ease, border-color .18s ease; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+    .note-action-item {
+      position: fixed; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; border: 1px solid rgba(255,255,255,.2); color: var(--text-main);
+      background: rgba(18,20,30,.96); box-shadow: 0 10px 26px rgba(0,0,0,.5); cursor: pointer;
+      pointer-events: auto; opacity: 0; transform: translate(-50%,-50%) scale(.3);
+      transition: left .16s cubic-bezier(.16,1,.3,1), top .16s cubic-bezier(.16,1,.3,1),
+                  opacity .18s ease, transform .22s cubic-bezier(.16,1,.3,1), background .18s ease, border-color .18s ease;
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    }
     #note-action-wheel.show .note-action-item { opacity: 1; transform: translate(-50%,-50%) scale(1); }
     .note-action-item:hover, .note-action-item.drag-over { background: var(--accent); border-color: rgba(255,255,255,.75); transform: translate(-50%,-50%) scale(1.13) !important; }
     .note-action-item[data-action="delete"] { color: var(--danger); }
     .note-action-item[data-action="delete"]:hover { color: #fff; background: var(--danger); border-color: var(--danger); }
     .note-action-item svg { width: 17px; height: 17px; }
-    @media (max-width: 700px) { #note-action-dot { right: 16px; bottom: 16px; } .note-action-item { width: 40px; height: 40px; } }
+    @media (max-width: 700px) { .note-action-item { width: 40px; height: 40px; } }
 
     /* Khu vực cuộn danh sách Note + Nút cuộn Lên/Xuống */
     .note-list-wrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
@@ -1194,10 +1218,7 @@
         border-radius: 20px;
       }
 
-      #note-action-dot {
-        right: max(14px, env(safe-area-inset-right));
-        bottom: max(14px, env(safe-area-inset-bottom));
-      }
+      #note-action-dot { right: auto; bottom: auto; }
 
       /* Keep the visual action dot tiny, but make its tap target comfortable. */
       #note-action-dot::before {
@@ -1284,12 +1305,18 @@
 
 
 
-    /* Nevos 3.2.2 — compact radial workspace control */
+    /* Nevos 3.2.3 — enlarged radial hover bridge; note-row action rail */
     #autolock-indicator { display: none !important; }
     .topbar-actions { gap: 8px; }
     .workspace-orbit.menu-dropdown {
       position: relative; z-index: 650; flex: 0 0 38px; width: 38px; height: 38px;
       overflow: visible; border-radius: 50%;
+    }
+    /* A transparent bridge fills the gaps between the lock and its three orbit actions.
+       It sits behind the real controls, so pointer travel cannot collapse the menu mid-flight. */
+    .workspace-orbit.menu-dropdown::before {
+      content: ""; position: absolute; left: -78px; top: -28px; width: 120px; height: 96px;
+      border-radius: 18px; background: transparent; z-index: 0; pointer-events: auto;
     }
     .workspace-orbit-main {
       position: relative; z-index: 2; width: 38px; height: 38px; padding: 0;
@@ -1362,6 +1389,8 @@
     /* Auto-scroll while reordering long pinned-note lists; turn off smooth scrolling during drag. */
     .note-list.drag-auto-scrolling { scroll-behavior: auto !important; overscroll-behavior: contain; }
     @media (hover: none) and (pointer: coarse) {
+      /* Touch opens the orbit by long-press; do not let its invisible bridge block the search field. */
+      .workspace-orbit.menu-dropdown::before { pointer-events: none; }
       .workspace-orbit.menu-dropdown { flex-basis: 40px; width: 40px; height: 40px; }
       .workspace-orbit-main { width: 40px; height: 40px; }
       .workspace-orbit .orbit-action { width: 36px; height: 36px; }
@@ -2698,7 +2727,7 @@
     }
 
     function pointInsideActionWheelZone(x, y) {
-      // Keep the hit zone available while hidden so re-entering it can reveal the wheel again.
+      // The active wheel keeps a generous drop zone around its animated action buttons.
       if (!actionWheelCenter) return false;
       return Math.hypot(x - actionWheelCenter.x, y - actionWheelCenter.y) <= actionWheelRadius + 42;
     }
@@ -2709,6 +2738,8 @@
 
     function updateNoteDropHighlight(session, x, y) {
       clearNoteDropTargets();
+      // The rail follows the note card's real row, not the pointer or compact drag ghost.
+      positionNoteActionDot(session);
       const hovered = document.elementFromPoint(x, y);
       const pill = hovered && hovered.closest ? hovered.closest('.category-pills .pill') : null;
       if (pill) pill.classList.add('drag-over');
@@ -2716,12 +2747,11 @@
       if (dot && pointNearActionDot(x, y)) dot.classList.add('drag-over');
 
       const wheel = document.getElementById('note-action-wheel');
-      if (pointInsideActionFeature(x, y)) {
-        if (!wheel.classList.contains('show') || actionWheelNoteId !== session.note.id) {
-          openNoteActionWheel(session.note.id);
-        }
-      } else if (wheel.classList.contains('show') && actionWheelNoteId === session.note.id) {
-        closeNoteActionWheel();
+      // Keep the wheel available for this one-note hold, unless the user explicitly dismissed it.
+      if (actionWheelSuppressUntilLeave) {
+        if (dot) dot.classList.remove('is-visible');
+      } else if (!wheel.classList.contains('show') || actionWheelNoteId !== session.note.id) {
+        openNoteActionWheel(session.note.id);
       }
 
       const hitAfterWheelUpdate = document.elementFromPoint(x, y);
@@ -2809,6 +2839,7 @@
       } else {
         list.classList.remove('drag-auto-scrolling');
       }
+      positionNoteActionDot(session);
 
       noteDragAutoScrollLastFrame = timestamp;
       noteDragAutoScrollFrameId = requestAnimationFrame(processNoteDragAutoScroll);
@@ -2825,6 +2856,9 @@
       document.body.classList.add('note-drag-active');
       try { document.getSelection()?.removeAllRanges(); } catch (_) {}
       session.ghost = createNoteDragGhost(session);
+      // Reveal the action rail only after the hold threshold, aligned to this card's row.
+      positionNoteActionDot(session);
+      openNoteActionWheel(session.note.id);
       // Capture after drag activation so the pointer stream remains consistent outside the icon.
       try { session.handle.setPointerCapture(session.pointerId); } catch (_) {}
     }
@@ -2909,6 +2943,8 @@
         movePinnedCard(session.cardEl, e.clientY);
         try { session.handle.setPointerCapture(e.pointerId); } catch (_) {}
       }
+      // Re-read the card bounds after reordering so the dot tracks the note row, not its icon.
+      positionNoteActionDot(session);
     }, { passive: false });
 
     async function finishNotePointer(e, cancelled = false) {
@@ -2918,9 +2954,11 @@
       if (session.phase !== 'dragging') {
         stopNoteDragAutoScroll();
         noteDragSession = null;
+        closeNoteActionWheel();
         return;
       }
       stopNoteDragAutoScroll();
+      positionNoteActionDot(session);
 
       const dropX = e.clientX;
       const dropY = e.clientY;
@@ -2941,6 +2979,8 @@
       clearNoteDropTargets();
       try { if (session.handle.hasPointerCapture(e.pointerId)) session.handle.releasePointerCapture(e.pointerId); } catch (_) {}
       noteDragSession = null;
+      // The rail and orbit fade away as soon as the single active hold ends.
+      closeNoteActionWheel();
       setTimeout(() => { delete session.cardEl.dataset.justDragged; }, 420);
 
       if (cancelled) {
@@ -2976,7 +3016,10 @@
       }
 
       if (droppedOnDot) {
-        openNoteActionWheel(noteId);
+        // The wheel is already available during the hold; dropping on the rail itself
+        // is not an action, so preserve any pin reorder and let the rail disappear.
+        if (shouldPersistPinnedOrder) await persistPinnedOrderFromVisibleDOM();
+        else renderNoteList();
         return;
       }
 
@@ -3812,10 +3855,96 @@
     let actionWheelCenter = null;
     let actionWheelRadius = 0;
     let actionWheelSuppressUntilLeave = false;
+    let actionWheelDismissTimer = null;
+
+    function positionNoteActionDot(session = noteDragSession) {
+      const dot = document.getElementById('note-action-dot');
+      if (!dot) return;
+      if (!session || session.phase !== 'dragging' || !session.cardEl?.isConnected || isNoteLocked(session.note)) {
+        dot.classList.remove('is-visible');
+        return;
+      }
+
+      const list = document.getElementById('note-list');
+      const sidebar = document.querySelector('.sidebar');
+      const editor = document.querySelector('.editor-pane');
+      const cardRect = session.cardEl.getBoundingClientRect();
+      const listRect = list?.getBoundingClientRect();
+      const sidebarRect = sidebar?.getBoundingClientRect();
+      const editorRect = editor?.getBoundingClientRect();
+      const dotHalf = (dot.offsetWidth || 16) / 2;
+      let railX;
+
+      // Desktop/tablet split view: use the middle of the actual sidebar/editor gutter.
+      if (sidebarRect && editorRect && editorRect.width > 0 && editorRect.left >= sidebarRect.right - 1) {
+        railX = (sidebarRect.right + editorRect.left) / 2;
+      } else if (listRect) {
+        // Stacked/mobile view has no sidebar/editor seam; keep the rail just inside the list edge.
+        railX = Math.min(window.innerWidth - dotHalf - 4, listRect.right + 8);
+      } else {
+        railX = window.innerWidth - dotHalf - 12;
+      }
+      railX = Math.max(dotHalf + 2, Math.min(window.innerWidth - dotHalf - 2, railX));
+
+      let railY = cardRect.top + cardRect.height / 2;
+      if (listRect && listRect.height > dot.offsetHeight + 4) {
+        railY = Math.max(listRect.top + dotHalf + 2, Math.min(listRect.bottom - dotHalf - 2, railY));
+      } else {
+        railY = Math.max(dotHalf + 2, Math.min(window.innerHeight - dotHalf - 2, railY));
+      }
+
+      dot.style.left = `${railX}px`;
+      dot.style.top = `${railY}px`;
+      dot.style.right = 'auto';
+      dot.style.bottom = 'auto';
+      dot.classList.add('is-visible');
+
+      if (document.getElementById('note-action-wheel')?.classList.contains('show') && actionWheelNoteId === session.note.id) {
+        positionNoteActionWheelFromDot();
+      }
+    }
+
+    function positionNoteActionWheelFromDot() {
+      const wheel = document.getElementById('note-action-wheel');
+      const dot = document.getElementById('note-action-dot');
+      if (!wheel || !dot || !wheel.classList.contains('show')) return;
+      const rect = dot.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const radius = Math.min(70, Math.max(56, Math.min(window.innerWidth, window.innerHeight) * 0.17));
+      const minX = radius + 26;
+      const maxX = Math.max(minX, window.innerWidth - radius - 26);
+      const minY = radius + 26;
+      const maxY = Math.max(minY, window.innerHeight - radius - 26);
+      const sidebarRect = document.querySelector('.sidebar')?.getBoundingClientRect();
+      const editorRect = document.querySelector('.editor-pane')?.getBoundingClientRect();
+      const hasSplitGutter = Boolean(sidebarRect && editorRect && editorRect.width > 0 && editorRect.left >= sidebarRect.right - 1);
+      let orbitCenterX;
+      let orbitCenterY;
+      if (hasSplitGutter && cx + radius + 24 <= maxX) {
+        // In split view, fan the wheel into the editor pane so it does not obstruct list reordering.
+        orbitCenterX = Math.max(minX, Math.min(maxX, cx + radius + 24));
+        orbitCenterY = Math.max(minY, Math.min(maxY, cy));
+      } else {
+        // In stacked/mobile view, prefer the free area above-left of the rail.
+        orbitCenterX = Math.max(minX, Math.min(maxX, cx - radius - 24));
+        orbitCenterY = Math.max(minY, Math.min(maxY, cy - radius - 24));
+      }
+      actionWheelCenter = { x: orbitCenterX, y: orbitCenterY };
+      actionWheelRadius = radius;
+
+      wheel.querySelectorAll('.note-action-item').forEach((button, index) => {
+        const angle = (-90 + index * (360 / NOTE_ACTIONS.length)) * Math.PI / 180;
+        button.style.left = `${orbitCenterX + Math.cos(angle) * radius}px`;
+        button.style.top = `${orbitCenterY + Math.sin(angle) * radius}px`;
+      });
+    }
 
     function openNoteActionWheel(noteId) {
+      const session = noteDragSession;
       const targetNote = decryptedNotes.find(n => n.id === noteId);
-      if (!noteId || !targetNote) return;
+      // One active pointer session is the sole source of truth for this transient wheel.
+      if (!session || session.phase !== 'dragging' || session.note.id !== noteId || !targetNote) return;
       if (isNoteLocked(targetNote)) {
         closeNoteActionWheel();
         return;
@@ -3825,17 +3954,10 @@
       const wheel = document.getElementById('note-action-wheel');
       const dot = document.getElementById('note-action-dot');
       if (!wheel || !dot) return;
+      if (actionWheelDismissTimer) { clearTimeout(actionWheelDismissTimer); actionWheelDismissTimer = null; }
+      positionNoteActionDot(session);
       wheel.innerHTML = '';
-      const rect = dot.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const radius = Math.min(70, Math.max(56, Math.min(window.innerWidth, window.innerHeight) * 0.17));
-      const orbitCenterX = Math.max(radius + 26, Math.min(window.innerWidth - radius - 26, cx - radius - 24));
-      const orbitCenterY = Math.max(radius + 26, Math.min(window.innerHeight - radius - 26, cy - radius - 24));
-      actionWheelCenter = { x: orbitCenterX, y: orbitCenterY };
-      actionWheelRadius = radius;
-      NOTE_ACTIONS.forEach((item, index) => {
-        const angle = (-90 + index * (360 / NOTE_ACTIONS.length)) * Math.PI / 180;
+      NOTE_ACTIONS.forEach(item => {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'note-action-item';
@@ -3843,8 +3965,6 @@
         button.title = item.title;
         button.setAttribute('aria-label', item.title);
         button.innerHTML = item.icon;
-        button.style.left = `${orbitCenterX + Math.cos(angle) * radius}px`;
-        button.style.top = `${orbitCenterY + Math.sin(angle) * radius}px`;
         button.addEventListener('click', async e => {
           e.preventDefault();
           e.stopPropagation();
@@ -3856,9 +3976,11 @@
         });
         wheel.appendChild(button);
       });
+      wheel.inert = false;
       wheel.classList.add('show');
       wheel.setAttribute('aria-hidden', 'false');
-      dot.classList.add('open');
+      dot.classList.add('open', 'is-visible');
+      positionNoteActionWheelFromDot();
     }
 
     function closeNoteActionWheel() {
@@ -3867,9 +3989,16 @@
       if (wheel) {
         wheel.classList.remove('show');
         wheel.setAttribute('aria-hidden', 'true');
-        wheel.innerHTML = '';
+        wheel.inert = true;
+        if (actionWheelDismissTimer) clearTimeout(actionWheelDismissTimer);
+        actionWheelDismissTimer = setTimeout(() => {
+          if (!wheel.classList.contains('show')) wheel.innerHTML = '';
+          actionWheelDismissTimer = null;
+        }, 240);
       }
-      if (dot) dot.classList.remove('open', 'drag-over');
+      if (dot) dot.classList.remove('open', 'drag-over', 'is-visible');
+      actionWheelCenter = null;
+      actionWheelRadius = 0;
       actionWheelNoteId = null;
     }
 
@@ -3980,44 +4109,23 @@
 
     const noteActionDot = document.getElementById('note-action-dot');
     if (noteActionDot) {
-      noteActionDot.addEventListener('pointerenter', e => {
-        if (e.pointerType === 'touch' || (noteDragSession && noteDragSession.phase === 'dragging')) return;
-        if (currentNoteId && !document.getElementById('note-action-wheel').classList.contains('show') && !actionWheelSuppressUntilLeave) openNoteActionWheel(currentNoteId);
+      noteActionDot.addEventListener('pointerenter', () => {
+        const session = noteDragSession;
+        if (!session || session.phase !== 'dragging' || actionWheelSuppressUntilLeave) return;
+        if (!document.getElementById('note-action-wheel').classList.contains('show')) openNoteActionWheel(session.note.id);
       });
       noteActionDot.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
-        const targetId = actionWheelNoteId || currentNoteId;
-        if (!targetId) return;
-        // Mouse users reveal the wheel by hovering; tapping still opens it on touch devices.
-        if (!document.getElementById('note-action-wheel').classList.contains('show')) openNoteActionWheel(targetId);
+        const session = noteDragSession;
+        if (!session || session.phase !== 'dragging') return;
+        if (!document.getElementById('note-action-wheel').classList.contains('show')) openNoteActionWheel(session.note.id);
       });
     }
-    document.addEventListener('pointermove', e => {
-      if (e.pointerType === 'touch') return;
-      if (noteDragSession && noteDragSession.phase === 'dragging') return;
-      const wheel = document.getElementById('note-action-wheel');
-      const nearDot = pointNearActionDot(e.clientX, e.clientY);
-      const inWheelZone = pointInsideActionWheelZone(e.clientX, e.clientY);
-      if (!nearDot && !inWheelZone) {
-        actionWheelSuppressUntilLeave = false;
-        if (wheel.classList.contains('show')) closeNoteActionWheel();
-        return;
-      }
-      if (actionWheelSuppressUntilLeave) return;
-      // Once a dragged note opens the wheel, keep that target until the pointer leaves.
-      if (!wheel.classList.contains('show')) {
-        const targetId = currentNoteId || actionWheelNoteId;
-        if (targetId) openNoteActionWheel(targetId);
-      }
-    });
-    document.addEventListener('pointerout', e => {
-      if (e.pointerType === 'touch') return;
-      if (!e.relatedTarget && !(noteDragSession && noteDragSession.phase === 'dragging')) closeNoteActionWheel();
-    });
+    // No idle hover/current-note trigger: the lower wheel belongs only to the active long-press.
     document.addEventListener('click', e => {
       if (e.target.closest('#note-action-dot, #note-action-wheel')) return;
-      if (document.getElementById('note-action-wheel')?.classList.contains('show')) closeNoteActionWheel();
+      if (!noteDragSession && document.getElementById('note-action-wheel')?.classList.contains('show')) closeNoteActionWheel();
     });
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
@@ -4026,8 +4134,15 @@
       }
     });
     window.addEventListener('resize', () => {
-      if (document.getElementById('note-action-wheel')?.classList.contains('show') && actionWheelNoteId) openNoteActionWheel(actionWheelNoteId);
-      else { actionWheelCenter = null; actionWheelRadius = 0; }
+      const session = noteDragSession;
+      if (session && session.phase === 'dragging') {
+        positionNoteActionDot(session);
+        if (!document.getElementById('note-action-wheel')?.classList.contains('show')) openNoteActionWheel(session.note.id);
+        else positionNoteActionWheelFromDot();
+      } else {
+        actionWheelCenter = null;
+        actionWheelRadius = 0;
+      }
     });
 
     function toggleSecretMask() {
