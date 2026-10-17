@@ -655,210 +655,570 @@
       text-align: left !important;
     }
 
-    /* iPhone-only polish: safe areas, stable two-row header, readable fields and touch targets.
-       Deliberately scoped to the existing phone breakpoint; iPad and desktop styles stay intact. */
-    @media (max-width: 700px) {
-      .app-overlay {
-        padding-top: max(8px, env(safe-area-inset-top, 0px));
-        padding-right: max(10px, env(safe-area-inset-right, 0px));
-        padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
-        padding-left: max(10px, env(safe-area-inset-left, 0px));
-        gap: 10px;
+    /* ------------------------------------------------------------------
+       iPhone UX remake — CSS only. Desktop/iPad rules and app logic stay intact.
+       Compact navigation, one primary task per screen, safe-area + thumb targets.
+    ------------------------------------------------------------------ */
+
+    /* Keep a dragged pinned card inside the scroll-list's clipping box.
+       Scaling the source card made its 1px left border paint outside overflow-x:hidden. */
+    .note-card.dragging-pin {
+      transform: none !important;
+      margin-inline: 1px;
+    }
+
+    @media screen and (max-width: 480px) and (hover: none) and (pointer: coarse),
+           screen and (max-width: 1000px) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
+      :root {
+        --radius-lg: 18px;
+        --radius-md: 13px;
+        --radius-sm: 10px;
       }
 
-      /* Grid avoids an accidental third header row on narrow iPhones. */
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
+      #app-container {
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+      }
+
+      #lock-screen {
+        padding: max(20px, env(safe-area-inset-top))
+                 max(22px, env(safe-area-inset-right))
+                 max(20px, env(safe-area-inset-bottom))
+                 max(22px, env(safe-area-inset-left));
+      }
+
+      .lock-card {
+        width: 100%;
+        max-width: 360px;
+        gap: 14px;
+      }
+
+      .text-input {
+        min-height: 54px;
+        padding: 17px 48px;
+        font-size: 16px;
+      }
+
+      .btn-auth { min-height: 50px; margin-top: 4px; }
+      .import-btn { height: 96px; border-radius: 20px; }
+      .dot-wrapper { margin-top: 8px; }
+      .dot-btn.back-mode { width: 40px; height: 40px; }
+
+      .app-overlay {
+        min-width: 0;
+        padding: max(8px, env(safe-area-inset-top))
+                 max(10px, env(safe-area-inset-right))
+                 max(8px, env(safe-area-inset-bottom))
+                 max(10px, env(safe-area-inset-left));
+        gap: 8px;
+        background: rgba(0, 0, 0, .34);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+      }
+
+      /* Two compact rows in the list view: identity/actions, then search. */
       .topbar {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
-        grid-template-areas:
-          "brand actions"
-          "search search";
+        grid-template-rows: auto auto;
         align-items: center;
-        column-gap: 8px;
-        row-gap: 8px;
-        min-width: 0;
-        padding: 9px 10px 10px;
-        border-radius: 17px;
+        gap: 8px 9px;
+        height: auto;
+        min-height: 50px;
+        flex-wrap: nowrap;
+        padding: 8px 9px;
+        border-radius: 16px;
+        overflow: visible;
       }
+
       .brand {
-        grid-area: brand;
+        grid-column: 1;
+        grid-row: 1;
         min-width: 0;
         gap: 7px;
-        font-size: 15px;
+        font-size: 16px;
         white-space: nowrap;
       }
-      .brand > svg { flex: 0 0 20px; }
-      .badge-aes { gap: 3px; white-space: nowrap; }
-      .topbar-actions {
-        grid-area: actions;
-        min-width: 0;
-        margin-left: 0;
-        gap: 4px;
-        flex-shrink: 0;
+
+      .brand > svg {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 18px;
       }
+
+      .badge-aes { display: none !important; }
+
+      .topbar-actions {
+        grid-column: 2;
+        grid-row: 1;
+        gap: 2px;
+        margin-left: 0;
+        min-width: 0;
+        justify-content: flex-end;
+      }
+
+      #autolock-indicator {
+        font-size: 10px !important;
+        padding: 5px 6px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: rgba(255,255,255,.035);
+        white-space: nowrap;
+      }
+
+      .topbar-actions > div[style*="background"] {
+        flex: 0 0 auto;
+        padding: 1px !important;
+        border-radius: 10px !important;
+      }
+
+      .topbar-actions > div[style*="background"] .icon-btn {
+        width: 31px !important;
+        height: 33px !important;
+      }
+
       .topbar-actions .icon-btn {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
-        min-height: 40px;
-        flex: 0 0 40px;
+        width: 35px;
+        height: 35px;
         border-radius: 10px;
       }
-      .topbar-actions > div:not(.menu-dropdown) .icon-btn {
-        width: 36px !important;
-        height: 38px !important;
-        min-width: 36px;
-        min-height: 38px;
-        flex-basis: 36px;
-      }
-      .topbar-actions > div:not(.menu-dropdown) {
-        flex-shrink: 0;
-      }
+
       .search-box {
-        grid-area: search;
+        grid-column: 1 / -1;
+        grid-row: 2;
         order: initial;
+        flex: none;
         width: 100%;
         min-width: 0;
-        min-height: 44px;
-        padding: 0 13px;
+        min-height: 42px;
+        padding: 0 12px;
+        border-radius: 12px;
         gap: 9px;
-        border-radius: 13px;
+        background: rgba(255,255,255,.045);
       }
+
       .search-box input {
         min-width: 0;
-        min-height: 42px;
+        padding: 9px 0;
         font-size: 16px;
       }
-      #autolock-indicator { font-size: 11px !important; }
 
-      .workspace { gap: 8px; }
-      .sidebar {
+      /* iPhone behaves as a native single-column flow, not a compressed split view. */
+      .workspace {
         min-width: 0;
-        padding: 10px;
-        gap: 10px;
-        border-radius: 17px;
-      }
-      .new-note-actions { gap: 8px; }
-      .new-note-actions .btn-new { min-height: 44px; border-radius: 12px; }
-      .new-note-actions .table-new-note { flex-basis: 44px; min-width: 44px; padding: 8px; }
-      .category-pills { gap: 6px; }
-      .pill {
-        width: auto;
-        min-width: 0;
-        height: 40px;
-        flex: 1 1 0;
-        border-radius: 10px;
-      }
-      .note-list {
-        min-width: 0;
-        padding: 2px 5px 10px 3px;
+        min-height: 0;
+        flex: 1 1 auto;
+        flex-direction: column;
         gap: 8px;
-        overscroll-behavior-y: contain;
-        scroll-padding-block: 8px;
+        overflow: hidden;
       }
-      .note-card {
+
+      .sidebar {
+        display: flex;
+        width: 100%;
+        height: auto;
+        max-height: none;
+        min-height: 0;
+        flex: 1 1 auto;
+        padding: 10px;
+        gap: 12px;
+        border-radius: 16px;
+        overflow: hidden;
+      }
+
+      .new-note-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 auto;
+      }
+
+      .new-note-actions .btn-new:first-child {
+        flex: 1 1 auto;
         min-width: 0;
-        min-height: 56px;
-        padding: 9px 10px;
-        gap: 10px;
+        height: 44px;
+        padding: 0 14px;
+        border-radius: 12px;
+        justify-content: center;
+        gap: 8px;
+        font-size: 0;
+      }
+
+      .new-note-actions .btn-new:first-child::before {
+        content: "+";
+        display: inline-block;
+        font-size: 23px;
+        font-weight: 400;
+        line-height: 1;
+      }
+
+      .new-note-actions .btn-new:first-child::after {
+        content: "New";
+        display: inline-block;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: .01em;
+      }
+
+      .new-note-actions .table-new-note {
+        flex: 0 0 44px;
+        width: 44px;
+        height: 44px;
+        padding: 0;
         border-radius: 12px;
       }
-      .note-card-icon { width: 38px; height: 38px; border-radius: 10px; }
-      .note-card-title { font-size: 14px; }
-      .note-card-meta { font-size: 12px; }
+
+      .category-pills {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        align-items: stretch;
+        justify-content: initial;
+        flex: 0 0 auto;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      .pill {
+        width: 100%;
+        min-width: 0;
+        height: 40px;
+        min-height: 40px;
+        border-radius: 11px;
+      }
+
+      .pill svg { width: 16px; height: 16px; }
+
+      .note-list {
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 2px 3px 5px;
+        gap: 7px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scroll-behavior: auto;
+        scrollbar-width: none;
+      }
+
+      .note-list::-webkit-scrollbar { display: none; }
+
+      .note-card {
+        min-width: 0;
+        min-height: 62px;
+        padding: 10px;
+        gap: 11px;
+        border: 1px solid rgba(255,255,255,.055);
+        border-radius: 13px;
+        background: rgba(255,255,255,.022);
+        transition: background .16s ease, border-color .16s ease;
+      }
+
+      .note-card:hover {
+        background: rgba(255,255,255,.045);
+        border-color: var(--border);
+      }
+
+      .note-card.active {
+        background: rgba(10,132,255,.105);
+        border-color: rgba(10,132,255,.38);
+      }
+
+      .note-card-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+      }
+
+      .note-card-title {
+        min-width: 0;
+        gap: 5px;
+        margin-bottom: 4px;
+        font-size: 14px;
+        line-height: 1.25;
+      }
+
+      .note-card-badges { gap: 4px; }
+      .note-card-meta { gap: 5px; font-size: 10px; line-height: 1.25; }
+
+      /* Detail screen: hide the redundant search row and give the editor the viewport. */
+      .app-overlay:has(.workspace.editing) .topbar {
+        grid-template-rows: auto;
+        min-height: 46px;
+        padding: 5px 7px;
+        gap: 0;
+      }
+
+      .app-overlay:has(.workspace.editing) .search-box {
+        display: none !important;
+      }
+
+      .workspace.editing .sidebar { display: none !important; }
+
+      .workspace.editing .editor-pane {
+        display: flex !important;
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        flex: 1 1 auto;
+        border-radius: 16px;
+      }
+
+      .workspace:not(.editing) .editor-pane { display: none !important; }
+      .workspace:not(.editing) .sidebar { display: flex !important; width: 100%; height: 100%; flex: 1 1 auto; }
 
       .editor-content {
         min-width: 0;
-        padding: 14px 12px max(16px, env(safe-area-inset-bottom, 0px));
-        gap: 12px;
-        overscroll-behavior-y: contain;
+        min-height: 0;
+        padding: 12px 12px max(14px, env(safe-area-inset-bottom));
+        gap: 10px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
       }
-      .editor-header { align-items: center; gap: 8px; padding-bottom: 12px; }
+
+      .editor-header {
+        position: sticky;
+        top: -12px;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr);
+        grid-template-areas:
+          "back title"
+          "tools tools";
+        align-items: center;
+        gap: 7px 9px;
+        margin: -12px -12px 0;
+        padding: 10px 12px 9px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(15,17,26,.94);
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
+      }
+
       #mobile-editor-back {
+        display: flex;
+        grid-area: back;
         width: 40px;
         height: 40px;
         flex: 0 0 40px;
-        border-radius: 10px;
+        border-radius: 12px;
       }
-      .title-group { gap: 8px; }
-      .title-input { font-size: 17px; }
-      .editor-tools { gap: 6px; }
-      .editor-tools .btn-save { min-height: 40px; padding: 0 13px; border-radius: 10px; }
-      .editor-tools .more-trigger-btn { width: 40px; height: 40px; }
-      .more-hover-menu { gap: 5px; padding: 5px; }
-      .more-hover-menu .icon-btn { width: 40px; height: 40px; }
 
-      /* 16px prevents Safari's focus-zoom on form fields; keep text comfortably readable. */
-      .text-input,
-      .search-box input,
-      .secret-box input,
-      .body-textarea,
-      #note-lock-pass,
-      #note-secret,
-      .sheet-cell,
-      .sheet-header-input,
-      .sheet-color-controls input[type="text"] {
+      .title-group {
+        grid-area: title;
+        display: flex;
+        width: 100%;
+        min-width: 0;
+        flex: initial;
+        gap: 7px;
+        overflow: hidden;
+      }
+
+      #editor-type-icon { flex: 0 0 auto; }
+
+      .title-input {
+        flex: 1 1 auto;
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+        padding: 5px 0;
+        font-size: 18px;
+        line-height: 1.3;
+      }
+
+      #note-category-label { display: none !important; }
+
+      .editor-tools {
+        grid-area: tools;
+        display: flex;
+        width: 100%;
+        min-width: 0;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 7px;
+      }
+
+      #save-status {
+        max-width: calc(100% - 105px);
+        margin-right: auto !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 10px !important;
+      }
+
+      .btn-save {
+        min-width: 78px;
+        min-height: 40px;
+        padding: 0 14px;
+        border-radius: 11px;
+        justify-content: center;
+        white-space: nowrap;
+      }
+
+      .more-trigger-btn,
+      .more-hover-wrap > .icon-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+      }
+
+      .more-hover-wrap:hover .more-trigger-btn { transform: none; }
+
+      .more-hover-menu {
+        top: auto;
+        right: 0;
+        bottom: calc(100% + 6px);
+        max-width: calc(100vw - 24px);
+        flex-wrap: nowrap;
+      }
+
+      .secret-box {
+        min-width: 0;
+        min-height: 48px;
+        flex: 0 0 auto;
+        padding: 4px 10px;
+        gap: 8px;
+        border-radius: 12px;
+      }
+
+      .secret-box input {
+        min-width: 0;
+        height: 36px;
+        line-height: 36px;
         font-size: 16px;
+        letter-spacing: .04em;
       }
-      .secret-box { min-height: 48px; padding: 7px 10px; gap: 8px; }
-      .secret-box input { min-width: 0; height: 32px; line-height: 32px; letter-spacing: .5px; }
-      .secret-actions { gap: 3px; }
-      .secret-actions .icon-btn { width: 36px !important; height: 36px !important; }
-      .body-textarea { min-height: 160px; padding: 14px; line-height: 1.55; }
-      .attachments-bar { min-height: 54px; padding: 8px 10px; gap: 8px; }
-      .att-left { min-width: 0; gap: 8px; }
-      .btn-add-att { top: 0; width: 40px; height: 40px; }
-      .menu-content { max-width: calc(100vw - 24px); }
-      .menu-item { min-height: 44px; padding: 11px 12px; font-size: 14px; }
-      .btn-modal { min-height: 44px; font-size: 12px; }
-      .sheet-btn { min-height: 38px; }
-      .sheet-grid th, .sheet-grid td { min-width: 116px; }
-      .sheet-grid thead th:not(:first-child) { min-width: 116px; }
-      .sheet-cell { min-width: 116px; height: 38px; padding: 8px 9px; }
-      .sheet-header-input { height: 30px; }
-      .sheet-toolbar { gap: 6px; }
-      .sheet-color-context { padding: 12px; }
 
-      /* Respect the iPhone home indicator and enlarge the action dot's hit area. */
-      #note-action-dot {
-        right: calc(env(safe-area-inset-right, 0px) + 16px);
-        bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-        width: 20px;
-        height: 20px;
+      .secret-actions { gap: 2px; }
+      .secret-actions .icon-btn { width: 34px !important; height: 34px !important; }
+
+      .body-textarea {
+        min-width: 0;
+        min-height: 220px;
+        flex: 1 0 220px;
+        padding: 13px;
+        border-radius: 12px;
+        font-size: 16px;
+        line-height: 1.55;
       }
+
+      .attachments-bar {
+        min-width: 0;
+        min-height: 54px;
+        flex: 0 0 auto;
+        padding: 8px 10px;
+        gap: 8px;
+        border-radius: 12px;
+      }
+
+      .att-left { min-width: 0; gap: 8px; }
+      .btn-add-att { width: 36px; height: 36px; }
+      .att-pill { max-width: 62vw; overflow: hidden; }
+
+      #note-table-wrap {
+        min-width: 0;
+        min-height: 220px;
+        flex: 1 0 220px;
+        gap: 8px;
+      }
+
+      .sheet-toolbar { gap: 6px; }
+      .sheet-toolbar-label { width: auto; font-size: 11px; }
+      .sheet-btn { min-height: 36px; padding: 7px 9px; border-radius: 9px; }
+      .sheet-scroll { min-height: 150px; }
+      .sheet-grid th, .sheet-grid td,
+      .sheet-grid thead th:not(:first-child),
+      .sheet-cell { min-width: 112px; }
+      .sheet-cell { height: 40px; padding: 8px; font-size: 16px; }
+      .sheet-header-input { font-size: 13px; }
+
+      #note-lock-view {
+        width: min(100%, 320px);
+        max-width: 320px;
+        margin: auto;
+        padding: 12px 4px;
+        gap: 12px;
+      }
+
+      #note-lock-view .text-input { font-size: 16px; }
+      #note-lock-view .sheet-btn {
+        width: 100%;
+        min-height: 44px;
+        margin-top: 4px;
+        border-radius: 12px;
+        font-size: 0;
+      }
+
+      #note-lock-view .sheet-btn::after {
+        content: "Back";
+        font-size: 13px;
+      }
+
+      .vault-modal-overlay {
+        align-items: center;
+        padding: max(14px, env(safe-area-inset-top)) 16px max(14px, env(safe-area-inset-bottom));
+      }
+
+      .vault-modal-card {
+        width: 100%;
+        max-width: 400px;
+        max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        padding: 20px 18px;
+        overflow-y: auto;
+        border-radius: 20px;
+      }
+
+      #note-action-dot {
+        right: max(14px, env(safe-area-inset-right));
+        bottom: max(14px, env(safe-area-inset-bottom));
+      }
+
+      /* Keep the visual action dot tiny, but make its tap target comfortable. */
       #note-action-dot::before {
         content: "";
         position: absolute;
-        inset: -12px;
+        width: 44px;
+        height: 44px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
         border-radius: 50%;
       }
+
       .note-action-item { width: 44px; height: 44px; }
 
-      /* Hover is unreliable on touchscreens; menu state should be explicit, not sticky-hover driven. */
-      .more-hover-wrap:not(.open):hover .more-hover-menu {
-        opacity: 0 !important;
-        visibility: hidden !important;
-        transform: translateY(-6px) scale(.95) !important;
+      /* The compact drag ghost remains above the list without clipping its own glyph. */
+      .note-drag-ghost.compact {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 5px;
+        overflow: visible;
+        border-radius: 50%;
       }
-      .more-hover-wrap:not(.open):hover .more-trigger-btn {
-        background: rgba(255,255,255,0.03);
-        color: var(--text-muted);
-        transform: none;
-        border-color: var(--border);
+
+      .note-drag-ghost.compact .note-card-icon {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        flex: 0 0 32px;
+        border-radius: 50%;
       }
-      .note-card:hover:not(.active) { background: transparent; border-color: transparent; }
-      .pill:hover:not(.active) { background: transparent; color: var(--text-muted); }
-      .icon-btn:hover:not(.lock-btn) { background: transparent; color: var(--text-muted); border-color: transparent; transform: none; }
-      .btn-new:hover { background: var(--accent); }
-      .btn-save:hover { transform: none; }
     }
 
-    @media (max-width: 360px) {
-      .badge-aes { display: none; }
-      .topbar-actions { gap: 3px; }
-      .topbar-actions .icon-btn { width: 36px; height: 38px; min-width: 36px; min-height: 38px; flex-basis: 36px; }
-      .topbar-actions > div:not(.menu-dropdown) .icon-btn { width: 33px !important; min-width: 33px; flex-basis: 33px; }
-    }
 </style>
 </head>
 <body>
@@ -2179,13 +2539,7 @@
       if (session.ghost) {
         if (!session.isProtectedLocked && distance > 42) session.ghost.classList.add('compact');
         const compact = session.ghost.classList.contains('compact');
-        // On narrow touch screens, keep the compact drag icon clear of the app's left frame.
-        // Drop hit-testing still follows the real pointer, so note actions and ordering are unchanged.
-        const compactLeft = e.clientX - 22;
-        const mobileCompactLeft = compact && window.matchMedia('(max-width: 700px)').matches
-          ? Math.max(12, compactLeft)
-          : compactLeft;
-        session.ghost.style.left = `${compact ? mobileCompactLeft : e.clientX - session.grabX}px`;
+        session.ghost.style.left = `${compact ? e.clientX - 22 : e.clientX - session.grabX}px`;
         session.ghost.style.top = `${compact ? e.clientY - 22 : e.clientY - session.grabY}px`;
       }
 
@@ -3784,7 +4138,7 @@
       const a = document.createElement('a');
       const dateTag = new Date().toISOString().slice(0, 10);
       a.href = url;
-      a.download = `SecretVault_${dateTag}.vault.json`; //////////
+      a.download = `SecretVault_${dateTag}.vault.json`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 3000);
     }
