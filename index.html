@@ -1271,18 +1271,14 @@
         margin: 0;
     }
 
-    @media screen and (orientation: landscape) and (max-height: 600px) {
-        #orientation-warning {
-            display: flex;
-        }
+    /* Chỉ hiển thị cảnh báo khi JS xác nhận đây là iPhone ở viewport landscape quá thấp. */
+    body.iphone-landscape-blocked > *:not(#orientation-warning) {
+        visibility: hidden !important;
+    }
 
-        body > *:not(#orientation-warning) {
-            visibility: hidden !important;
-        }
-
-        body > #orientation-warning {
-            visibility: visible !important;
-        }
+    body.iphone-landscape-blocked > #orientation-warning {
+        display: flex !important;
+        visibility: visible !important;
     }
 
 
@@ -1663,6 +1659,36 @@
 
 
   <script>
+    // Chỉ chặn iPhone khi viewport landscape thực sự thấp; không chặn Mac/iPad resize.
+    (() => {
+      const orientationWarning = document.getElementById('orientation-warning');
+      if (!orientationWarning) return;
+
+      // UA scope là cần thiết vì Mac/iPad có thể được resize về cùng kích thước CSS với iPhone.
+      const isIPhone = /iPhone/i.test(navigator.userAgent) || /iPhone/i.test(navigator.platform || '');
+
+      // Dùng breakpoint landscape đã tồn tại trong CSS của ứng dụng.
+      const MAX_LANDSCAPE_WIDTH = 1000;
+      const MAX_LANDSCAPE_HEIGHT = 500;
+
+      function updateIPhoneOrientationGuard() {
+        // clientWidth/clientHeight là kích thước viewport theo CSS pixels.
+        const width = document.documentElement.clientWidth;
+        const height = document.documentElement.clientHeight;
+        const shouldBlock = isIPhone &&
+          width > height &&
+          width <= MAX_LANDSCAPE_WIDTH &&
+          height <= MAX_LANDSCAPE_HEIGHT;
+
+        document.body.classList.toggle('iphone-landscape-blocked', shouldBlock);
+        orientationWarning.setAttribute('aria-hidden', String(!shouldBlock));
+      }
+
+      window.addEventListener('resize', updateIPhoneOrientationGuard, { passive: true });
+      window.addEventListener('orientationchange', updateIPhoneOrientationGuard, { passive: true });
+      updateIPhoneOrientationGuard();
+    })();
+
     // === THÊM HÀM NÀY VÀO TRONG SCRIPT ĐỂ XỬ LÝ DROPDOWN MENU ===
     function toggleMenu(menuId) {
       document.querySelectorAll('.menu-content').forEach(m => {
