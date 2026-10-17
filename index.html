@@ -654,6 +654,211 @@
     #note-secret {
       text-align: left !important;
     }
+
+    /* iPhone-only polish: safe areas, stable two-row header, readable fields and touch targets.
+       Deliberately scoped to the existing phone breakpoint; iPad and desktop styles stay intact. */
+    @media (max-width: 700px) {
+      .app-overlay {
+        padding-top: max(8px, env(safe-area-inset-top, 0px));
+        padding-right: max(10px, env(safe-area-inset-right, 0px));
+        padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+        padding-left: max(10px, env(safe-area-inset-left, 0px));
+        gap: 10px;
+      }
+
+      /* Grid avoids an accidental third header row on narrow iPhones. */
+      .topbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+          "brand actions"
+          "search search";
+        align-items: center;
+        column-gap: 8px;
+        row-gap: 8px;
+        min-width: 0;
+        padding: 9px 10px 10px;
+        border-radius: 17px;
+      }
+      .brand {
+        grid-area: brand;
+        min-width: 0;
+        gap: 7px;
+        font-size: 15px;
+        white-space: nowrap;
+      }
+      .brand > svg { flex: 0 0 20px; }
+      .badge-aes { gap: 3px; white-space: nowrap; }
+      .topbar-actions {
+        grid-area: actions;
+        min-width: 0;
+        margin-left: 0;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .topbar-actions .icon-btn {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+        flex: 0 0 40px;
+        border-radius: 10px;
+      }
+      .topbar-actions > div:not(.menu-dropdown) .icon-btn {
+        width: 36px !important;
+        height: 38px !important;
+        min-width: 36px;
+        min-height: 38px;
+        flex-basis: 36px;
+      }
+      .topbar-actions > div:not(.menu-dropdown) {
+        flex-shrink: 0;
+      }
+      .search-box {
+        grid-area: search;
+        order: initial;
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
+        padding: 0 13px;
+        gap: 9px;
+        border-radius: 13px;
+      }
+      .search-box input {
+        min-width: 0;
+        min-height: 42px;
+        font-size: 16px;
+      }
+      #autolock-indicator { font-size: 11px !important; }
+
+      .workspace { gap: 8px; }
+      .sidebar {
+        min-width: 0;
+        padding: 10px;
+        gap: 10px;
+        border-radius: 17px;
+      }
+      .new-note-actions { gap: 8px; }
+      .new-note-actions .btn-new { min-height: 44px; border-radius: 12px; }
+      .new-note-actions .table-new-note { flex-basis: 44px; min-width: 44px; padding: 8px; }
+      .category-pills { gap: 6px; }
+      .pill {
+        width: auto;
+        min-width: 0;
+        height: 40px;
+        flex: 1 1 0;
+        border-radius: 10px;
+      }
+      .note-list {
+        min-width: 0;
+        padding: 2px 5px 10px 3px;
+        gap: 8px;
+        overscroll-behavior-y: contain;
+        scroll-padding-block: 8px;
+      }
+      .note-card {
+        min-width: 0;
+        min-height: 56px;
+        padding: 9px 10px;
+        gap: 10px;
+        border-radius: 12px;
+      }
+      .note-card-icon { width: 38px; height: 38px; border-radius: 10px; }
+      .note-card-title { font-size: 14px; }
+      .note-card-meta { font-size: 12px; }
+
+      .editor-content {
+        min-width: 0;
+        padding: 14px 12px max(16px, env(safe-area-inset-bottom, 0px));
+        gap: 12px;
+        overscroll-behavior-y: contain;
+      }
+      .editor-header { align-items: center; gap: 8px; padding-bottom: 12px; }
+      #mobile-editor-back {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        border-radius: 10px;
+      }
+      .title-group { gap: 8px; }
+      .title-input { font-size: 17px; }
+      .editor-tools { gap: 6px; }
+      .editor-tools .btn-save { min-height: 40px; padding: 0 13px; border-radius: 10px; }
+      .editor-tools .more-trigger-btn { width: 40px; height: 40px; }
+      .more-hover-menu { gap: 5px; padding: 5px; }
+      .more-hover-menu .icon-btn { width: 40px; height: 40px; }
+
+      /* 16px prevents Safari's focus-zoom on form fields; keep text comfortably readable. */
+      .text-input,
+      .search-box input,
+      .secret-box input,
+      .body-textarea,
+      #note-lock-pass,
+      #note-secret,
+      .sheet-cell,
+      .sheet-header-input,
+      .sheet-color-controls input[type="text"] {
+        font-size: 16px;
+      }
+      .secret-box { min-height: 48px; padding: 7px 10px; gap: 8px; }
+      .secret-box input { min-width: 0; height: 32px; line-height: 32px; letter-spacing: .5px; }
+      .secret-actions { gap: 3px; }
+      .secret-actions .icon-btn { width: 36px !important; height: 36px !important; }
+      .body-textarea { min-height: 160px; padding: 14px; line-height: 1.55; }
+      .attachments-bar { min-height: 54px; padding: 8px 10px; gap: 8px; }
+      .att-left { min-width: 0; gap: 8px; }
+      .btn-add-att { top: 0; width: 40px; height: 40px; }
+      .menu-content { max-width: calc(100vw - 24px); }
+      .menu-item { min-height: 44px; padding: 11px 12px; font-size: 14px; }
+      .btn-modal { min-height: 44px; font-size: 12px; }
+      .sheet-btn { min-height: 38px; }
+      .sheet-grid th, .sheet-grid td { min-width: 116px; }
+      .sheet-grid thead th:not(:first-child) { min-width: 116px; }
+      .sheet-cell { min-width: 116px; height: 38px; padding: 8px 9px; }
+      .sheet-header-input { height: 30px; }
+      .sheet-toolbar { gap: 6px; }
+      .sheet-color-context { padding: 12px; }
+
+      /* Respect the iPhone home indicator and enlarge the action dot's hit area. */
+      #note-action-dot {
+        right: calc(env(safe-area-inset-right, 0px) + 16px);
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+        width: 20px;
+        height: 20px;
+      }
+      #note-action-dot::before {
+        content: "";
+        position: absolute;
+        inset: -12px;
+        border-radius: 50%;
+      }
+      .note-action-item { width: 44px; height: 44px; }
+
+      /* Hover is unreliable on touchscreens; menu state should be explicit, not sticky-hover driven. */
+      .more-hover-wrap:not(.open):hover .more-hover-menu {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transform: translateY(-6px) scale(.95) !important;
+      }
+      .more-hover-wrap:not(.open):hover .more-trigger-btn {
+        background: rgba(255,255,255,0.03);
+        color: var(--text-muted);
+        transform: none;
+        border-color: var(--border);
+      }
+      .note-card:hover:not(.active) { background: transparent; border-color: transparent; }
+      .pill:hover:not(.active) { background: transparent; color: var(--text-muted); }
+      .icon-btn:hover:not(.lock-btn) { background: transparent; color: var(--text-muted); border-color: transparent; transform: none; }
+      .btn-new:hover { background: var(--accent); }
+      .btn-save:hover { transform: none; }
+    }
+
+    @media (max-width: 360px) {
+      .badge-aes { display: none; }
+      .topbar-actions { gap: 3px; }
+      .topbar-actions .icon-btn { width: 36px; height: 38px; min-width: 36px; min-height: 38px; flex-basis: 36px; }
+      .topbar-actions > div:not(.menu-dropdown) .icon-btn { width: 33px !important; min-width: 33px; flex-basis: 33px; }
+    }
 </style>
 </head>
 <body>
@@ -1974,7 +2179,13 @@
       if (session.ghost) {
         if (!session.isProtectedLocked && distance > 42) session.ghost.classList.add('compact');
         const compact = session.ghost.classList.contains('compact');
-        session.ghost.style.left = `${compact ? e.clientX - 22 : e.clientX - session.grabX}px`;
+        // On narrow touch screens, keep the compact drag icon clear of the app's left frame.
+        // Drop hit-testing still follows the real pointer, so note actions and ordering are unchanged.
+        const compactLeft = e.clientX - 22;
+        const mobileCompactLeft = compact && window.matchMedia('(max-width: 700px)').matches
+          ? Math.max(12, compactLeft)
+          : compactLeft;
+        session.ghost.style.left = `${compact ? mobileCompactLeft : e.clientX - session.grabX}px`;
         session.ghost.style.top = `${compact ? e.clientY - 22 : e.clientY - session.grabY}px`;
       }
 
@@ -3573,7 +3784,7 @@
       const a = document.createElement('a');
       const dateTag = new Date().toISOString().slice(0, 10);
       a.href = url;
-      a.download = `SecretVault_${dateTag}.vault`;
+      a.download = `SecretVault_${dateTag}.vault.json`; //////////
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 3000);
     }
