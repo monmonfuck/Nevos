@@ -57,7 +57,7 @@
     /* LOCK SCREEN (Giữ nguyên từ Phase 1) */
     #lock-screen {
       position: fixed; inset: 0; z-index: 9999;
-      background: url('Cubist.png') center/cover no-repeat, var(--bg-primary); /* ////////////////////////////////////////////// */
+      background: url('ubist.png') center/cover no-repeat, var(--bg-primary); /* ////////////////////////////////////////////// */
       display: flex; align-items: center; justify-content: center; padding: 20px;
     }
     .lock-card { width: 100%; max-width: 320px; display: flex; flex-direction: column; align-items: center; gap: 16px; animation: formFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -675,7 +675,14 @@
         --radius-sm: 10px;
       }
 
-      html {
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
+      /* html {
         width: 100%;
         height: 100%;
         overflow: hidden;
@@ -684,11 +691,12 @@
 
       body {
         width: 100%;
-        height: 100vh;   /* Fallback cho trình duyệt cũ */
-        height: 100dvh;  /* Chiều cao viewport động trên Safari */
+        height: 100vh;  
+        height: 100dvh;
         overflow: hidden;
         overscroll-behavior: none;
-      }
+      } */
+      
       #app-container {
         width: 100%;
         min-width: 0;
@@ -1636,12 +1644,20 @@
 
   <!-- Cảnh báo xoay điện thoại dọc -->
   <div id="orientation-warning" role="alert">
-      <div class="orientation-icon">📱</div>
-      <h2>Vui lòng xoay điện thoại dọc</h2>
+      <div class="orientation-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M21 15v6h-6"/>
+          <path d="M21 21l-6-6"/>
+          <path d="M3 9V3h6"/>
+          <path d="M3 3l6 6"/>
+        </svg>
+      </div>
+
+      <h2>Tỷ lệ cửa sổ không được hỗ trợ</h2>
       <p>
-          Giao diện Nevos hiện chỉ hỗ trợ sử dụng
-          trên điện thoại ở chế độ dọc.
-          Vui lòng xoay điện thoại về chiều dọc để tiếp tục.
+          Giao diện Nevos không hỗ trợ sử dụng ở tỷ lệ cửa sổ này.
+          Vui lòng xoay điện thoại về chiều dọc để tiếp tục hoặc đổi tỷ lệ cửa sổ.
       </p>
   </div>
 
