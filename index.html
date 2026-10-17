@@ -1282,6 +1282,103 @@
     }
 
 
+
+
+    /* Nevos 3.2.2 — compact radial workspace control */
+    #autolock-indicator { display: none !important; }
+    .topbar-actions { gap: 8px; }
+    .workspace-orbit.menu-dropdown {
+      position: relative; z-index: 650; flex: 0 0 38px; width: 38px; height: 38px;
+      overflow: visible; border-radius: 50%;
+    }
+    .workspace-orbit-main {
+      position: relative; z-index: 2; width: 38px; height: 38px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(255,255,255,.18); border-radius: 50%;
+      color: var(--text-main); background: rgba(255,255,255,.07);
+      box-shadow: 0 6px 20px rgba(0,0,0,.22); cursor: pointer;
+      transition: background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+      touch-action: manipulation;
+    }
+    .workspace-orbit-main:hover, .workspace-orbit-main:focus-visible {
+      background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.42);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.055), 0 8px 22px rgba(0,0,0,.32);
+    }
+    .workspace-orbit-main:active { background: var(--danger); border-color: var(--danger); transform: scale(.93); }
+    .workspace-orbit-menu {
+      position: absolute; left: 50%; top: 50%; width: 138px; height: 116px;
+      transform: translate(-50%,-50%); z-index: 1; pointer-events: none;
+    }
+    .workspace-orbit .orbit-action {
+      --orbit-x: 0px; --orbit-y: 0px;
+      position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(255,255,255,.2); border-radius: 50%;
+      color: var(--text-main); background: rgba(18,20,30,.97);
+      box-shadow: 0 9px 24px rgba(0,0,0,.42);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transform: translate(calc(-50% + var(--orbit-x)),calc(-50% + var(--orbit-y))) scale(.58);
+      transition: opacity .17s ease, visibility .17s ease, transform .22s cubic-bezier(.16,1,.3,1),
+                  background .18s ease, border-color .18s ease;
+      -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+      cursor: pointer; touch-action: manipulation;
+    }
+    .workspace-orbit .orbit-action[data-action="settings"] { --orbit-x: -44px; --orbit-y: -26px; }
+    .workspace-orbit .orbit-action[data-action="download"] { --orbit-x: -76px; --orbit-y: 0px; }
+    .workspace-orbit .orbit-action[data-action="upload"] { --orbit-x: -44px; --orbit-y: 26px; }
+    .workspace-orbit:hover .orbit-action,
+    .workspace-orbit:focus-within .orbit-action,
+    .workspace-orbit.is-open .orbit-action {
+      opacity: 1; visibility: visible; pointer-events: auto;
+      transform: translate(calc(-50% + var(--orbit-x)),calc(-50% + var(--orbit-y))) scale(1);
+    }
+    .workspace-orbit .orbit-action:hover,
+    .workspace-orbit .orbit-action:focus-visible,
+    .workspace-orbit .orbit-action:active {
+      color: #fff; background: var(--accent); border-color: rgba(255,255,255,.78);
+      outline: none; transform: translate(calc(-50% + var(--orbit-x)),calc(-50% + var(--orbit-y))) scale(1.08);
+    }
+    .workspace-orbit-settings-menu { top: calc(100% + 8px); right: 0; z-index: 5; }
+    .workspace-orbit-settings-menu.show { display: block; }
+    .workspace-orbit .menu-item { min-height: 38px; }
+
+    /* The logo is the empty-state escape hatch: open the first visible note or create one if empty. */
+    #empty-state .empty-state-logo {
+      appearance: none; display: block; margin: 0 auto 8px; padding: 7px;
+      border: 1px solid transparent; border-radius: 30px; background: transparent;
+      color: inherit; cursor: pointer; line-height: 0;
+      transition: transform .22s cubic-bezier(.16,1,.3,1), border-color .2s ease, background .2s ease, filter .2s ease;
+      touch-action: manipulation;
+    }
+    #empty-state .empty-state-logo svg { display: block; width: 200px; height: 200px; }
+    #empty-state .empty-state-logo:hover {
+      transform: translateY(-2px) scale(1.015); border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.025); filter: drop-shadow(0 8px 18px rgba(10,132,255,.14));
+    }
+    #empty-state .empty-state-logo:active { transform: scale(.98); }
+    #empty-state .empty-state-logo:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    #empty-state p { cursor: default; }
+
+    /* Auto-scroll while reordering long pinned-note lists; turn off smooth scrolling during drag. */
+    .note-list.drag-auto-scrolling { scroll-behavior: auto !important; overscroll-behavior: contain; }
+    @media (hover: none) and (pointer: coarse) {
+      .workspace-orbit.menu-dropdown { flex-basis: 40px; width: 40px; height: 40px; }
+      .workspace-orbit-main { width: 40px; height: 40px; }
+      .workspace-orbit .orbit-action { width: 36px; height: 36px; }
+      .workspace-orbit .orbit-action[data-action="settings"] { --orbit-x: -44px; --orbit-y: -18px; }
+      .workspace-orbit .orbit-action[data-action="download"] { --orbit-x: -76px; --orbit-y: 0px; }
+      .workspace-orbit .orbit-action[data-action="upload"] { --orbit-x: -44px; --orbit-y: 18px; }
+      .workspace-orbit:hover:not(.is-open):not(:focus-within) .orbit-action {
+        opacity: 0; visibility: hidden; pointer-events: none;
+        transform: translate(calc(-50% + var(--orbit-x)),calc(-50% + var(--orbit-y))) scale(.58);
+      }
+      #empty-state .empty-state-logo { padding: 5px; margin-bottom: 10px; }
+      #empty-state .empty-state-logo svg { width: min(200px, 58vw); height: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .workspace-orbit-main, .workspace-orbit .orbit-action, #empty-state .empty-state-logo { transition-duration: .01ms; }
+    }
+
 </style>
 </head>
 <body>
@@ -1361,31 +1458,40 @@
         </div>
 
         <div class="topbar-actions">
-          <span id="autolock-indicator" style="font-size: 13px; color: var(--text-muted); font-variant-numeric: tabular-nums;">
-            03:00
-          </span>
-
-          <!-- Cụm Export/Import -->
-          <div style="display: flex; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 2px;">
-            <button class="icon-btn" onclick="exportEncryptedVault()" title="Export .vault" style="border:none; background:none; width:30px; height:30px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></button>
-            <button class="icon-btn" onclick="document.getElementById('import-merge-input').click()" title="Import .vault" style="border:none; background:none; width:30px; height:30px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></button>
-          </div>
+          <!-- The inactivity timer remains active internally; only its visual counter is removed. -->
+          <span id="autolock-indicator" aria-hidden="true" style="display:none; font-size:13px; color:var(--text-muted); font-variant-numeric:tabular-nums;">03:00</span>
           <input type="file" id="import-merge-input" accept=".vault,application/json" style="display:none" onchange="importAndMergeVault(event)" />
 
-          <!-- Cài đặt -->
-          <div class="menu-dropdown">
-            <button class="icon-btn" onclick="toggleMenu('settings-menu')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <div class="workspace-orbit menu-dropdown" id="workspace-orbit">
+            <button type="button" class="workspace-orbit-main" id="workspace-orbit-lock"
+                    onclick="handleWorkspaceOrbitClick(event)"
+                    onpointerdown="startWorkspaceOrbitPress(event)"
+                    onpointerup="endWorkspaceOrbitPress()"
+                    onpointercancel="endWorkspaceOrbitPress()"
+                    oncontextmenu="event.preventDefault()"
+                    aria-label="Lock vault"
+                    aria-haspopup="true" aria-expanded="false" aria-controls="workspace-orbit-menu"
+                    title="Tap to lock immediately · Hold or hover for quick actions">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
             </button>
-            <div id="settings-menu" class="menu-content">
+            <div class="workspace-orbit-menu" id="workspace-orbit-menu" role="group" aria-label="Vault quick actions">
+              <button type="button" class="orbit-action" data-action="settings" onclick="runWorkspaceOrbitAction('settings', event)" title="Settings" aria-label="Settings">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a2 2 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              </button>
+              <button type="button" class="orbit-action" data-action="download" onclick="runWorkspaceOrbitAction('download', event)" title="Download / Export vault" aria-label="Download or export vault">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5 5 5-5"></path><path d="M12 15V3"></path></svg>
+              </button>
+              <button type="button" class="orbit-action" data-action="upload" onclick="runWorkspaceOrbitAction('upload', event)" title="Upload / Import vault" aria-label="Upload or import vault">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 8l5-5 5 5"></path><path d="M12 3v12"></path></svg>
+              </button>
+            </div>
+            <div id="settings-menu" class="menu-content workspace-settings-menu">
               <button class="menu-item" onclick="changeMasterPassword()">Change Password</button>
-              <button class="menu-item danger" onclick="panicWipeVault()">Self-destruct</button> <!---//////////////////////// ------->
+              <button class="menu-item danger" onclick="panicWipeVault()">Self-destruct</button>
             </div>
           </div>
-
-          <button class="icon-btn lock-btn" onclick="lockVault()" title="Lock Vault">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-          </button>
         </div>
       </header>
 
@@ -1422,11 +1528,9 @@
 
         <!-- Editor -->
         <main class="editor-pane glass-panel">
-          <!-- <div class="empty-state" id="empty-state" style="-webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">
-              <img src="Icon.png" alt="Icon" width="48" height="48" style="margin-bottom: 16px; object-fit: contain;">
-              <p>Copyright © MBC. All rights reserved.</p>
-          </div> -->
           <div class="empty-state" id="empty-state" style="-webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">
+            <button type="button" class="empty-state-logo" onclick="openNoteFromEmptyState()"
+                    aria-label="Open the first note or create a new note" title="Open a note or create your first note">
             <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <!-- Dải màu Cyan - Blue - Purple hiện đại -->
@@ -1456,6 +1560,7 @@
               <circle cx="135" cy="117" r="2.2" fill="#0F172A"/>
               <path d="M 134 118 L 133.5 124 H 136.5 L 136 118 Z" fill="#0F172A"/>
             </svg>
+            </button>
 
             <p>Copyright © MBC. All rights reserved.</p>
           </div>
@@ -1696,10 +1801,75 @@
       });
       document.getElementById(menuId).classList.toggle('show');
     }
+
+
+    // Workspace quick actions: a short press locks; a touch/pen hold reveals the radial actions.
+    let workspaceOrbitHoldTimer = null;
+    let workspaceOrbitLongPressTriggered = false;
+
+    function openWorkspaceOrbitMenu() {
+      const root = document.getElementById('workspace-orbit');
+      const trigger = document.getElementById('workspace-orbit-lock');
+      if (!root || !trigger) return;
+      root.classList.add('is-open');
+      trigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeWorkspaceOrbitMenu() {
+      if (workspaceOrbitHoldTimer) clearTimeout(workspaceOrbitHoldTimer);
+      workspaceOrbitHoldTimer = null;
+      const root = document.getElementById('workspace-orbit');
+      const trigger = document.getElementById('workspace-orbit-lock');
+      if (root) root.classList.remove('is-open');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function startWorkspaceOrbitPress(event) {
+      if (!event || (event.pointerType !== 'touch' && event.pointerType !== 'pen')) return;
+      if (workspaceOrbitHoldTimer) clearTimeout(workspaceOrbitHoldTimer);
+      workspaceOrbitLongPressTriggered = false;
+      workspaceOrbitHoldTimer = setTimeout(() => {
+        workspaceOrbitLongPressTriggered = true;
+        openWorkspaceOrbitMenu();
+      }, 420);
+    }
+
+    function endWorkspaceOrbitPress() {
+      if (workspaceOrbitHoldTimer) clearTimeout(workspaceOrbitHoldTimer);
+      workspaceOrbitHoldTimer = null;
+    }
+
+    function handleWorkspaceOrbitClick(event) {
+      event?.preventDefault();
+      if (workspaceOrbitLongPressTriggered) {
+        workspaceOrbitLongPressTriggered = false;
+        event?.stopPropagation();
+        return;
+      }
+      closeWorkspaceOrbitMenu();
+      document.getElementById('settings-menu')?.classList.remove('show');
+      void lockVault();
+    }
+
+    function runWorkspaceOrbitAction(action, event) {
+      event?.preventDefault();
+      event?.stopPropagation();
+      closeWorkspaceOrbitMenu();
+      if (action !== 'settings') document.getElementById('settings-menu')?.classList.remove('show');
+      if (action === 'settings') {
+        toggleMenu('settings-menu');
+      } else if (action === 'upload') {
+        document.getElementById('import-merge-input')?.click();
+      } else if (action === 'download') {
+        void exportEncryptedVault();
+      }
+    }
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.menu-dropdown')) {
         document.querySelectorAll('.menu-content').forEach(m => m.classList.remove('show'));
       }
+      // A touch-opened radial menu closes when the user taps anywhere outside it.
+      if (!e.target.closest('#workspace-orbit')) closeWorkspaceOrbitMenu();
     });
 
     function toggleMoreMenu(event) {
@@ -2462,6 +2632,8 @@
     // Dragging starts from the note card's usable surface (not just its icon); restore on release.
     let noteDragSession = null;
     let noteDragHoldTimer = null;
+    let noteDragAutoScrollFrameId = 0;
+    let noteDragAutoScrollLastFrame = 0;
     let noteAutoSaveTimer = null;
     let noteSaveQueue = Promise.resolve();
     let isVaultMaintenance = false;
@@ -2574,6 +2746,74 @@
       }
     }
 
+
+    function stopNoteDragAutoScroll() {
+      if (noteDragAutoScrollFrameId) cancelAnimationFrame(noteDragAutoScrollFrameId);
+      noteDragAutoScrollFrameId = 0;
+      noteDragAutoScrollLastFrame = 0;
+      document.getElementById('note-list')?.classList.remove('drag-auto-scrolling');
+    }
+
+    function ensureNoteDragAutoScroll() {
+      if (!noteDragAutoScrollFrameId) {
+        noteDragAutoScrollLastFrame = 0;
+        noteDragAutoScrollFrameId = requestAnimationFrame(processNoteDragAutoScroll);
+      }
+    }
+
+    function processNoteDragAutoScroll(timestamp) {
+      noteDragAutoScrollFrameId = 0;
+      const session = noteDragSession;
+      if (!session || session.phase !== 'dragging' || !session.note.pinned || !session.moved) {
+        stopNoteDragAutoScroll();
+        return;
+      }
+
+      const list = document.getElementById('note-list');
+      if (!list || !list.contains(session.cardEl)) {
+        stopNoteDragAutoScroll();
+        return;
+      }
+
+      const x = Number(session.lastClientX);
+      const y = Number(session.lastClientY);
+      const rect = list.getBoundingClientRect();
+      const hovered = document.elementFromPoint(x, y);
+      const overCategory = Boolean(hovered?.closest?.('.category-pills .pill'));
+      const overAction = pointInsideActionFeature(x, y);
+      const insideHorizontalRange = x >= rect.left - 18 && x <= rect.right + 18;
+      const canScroll = list.scrollHeight > list.clientHeight + 1;
+      const edgeZone = Math.min(68, Math.max(46, rect.height * 0.16));
+      let direction = 0;
+      let intensity = 0;
+
+      if (insideHorizontalRange && canScroll && !overCategory && !overAction) {
+        if (y < rect.top + edgeZone) {
+          direction = -1;
+          intensity = Math.min(1, Math.max(0, (rect.top + edgeZone - y) / edgeZone));
+        } else if (y > rect.bottom - edgeZone) {
+          direction = 1;
+          intensity = Math.min(1, Math.max(0, (y - (rect.bottom - edgeZone)) / edgeZone));
+        }
+      }
+
+      const frameMs = noteDragAutoScrollLastFrame ? Math.min(34, timestamp - noteDragAutoScrollLastFrame) : 16;
+      if (direction && intensity > 0) {
+        list.classList.add('drag-auto-scrolling');
+        const previousTop = list.scrollTop;
+        // Smooth acceleration near the edge; cap speed so touch reordering stays controllable.
+        list.scrollTop += direction * 720 * intensity * intensity * (frameMs / 1000);
+        if (Math.abs(list.scrollTop - previousTop) > 0.1 && !overCategory && !overAction) {
+          movePinnedCard(session.cardEl, y);
+        }
+      } else {
+        list.classList.remove('drag-auto-scrolling');
+      }
+
+      noteDragAutoScrollLastFrame = timestamp;
+      noteDragAutoScrollFrameId = requestAnimationFrame(processNoteDragAutoScroll);
+    }
+
     function startNotePointerDrag(session) {
       if (noteDragSession !== session || session.phase !== 'pending') return;
       clearNoteDragHold();
@@ -2607,6 +2847,7 @@
         const session = {
           cardEl, handle, note, pointerId: e.pointerId,
           startX: e.clientX, startY: e.clientY,
+          lastClientX: e.clientX, lastClientY: e.clientY,
           grabX: e.clientX - cardRect.left, grabY: e.clientY - cardRect.top,
           cardRect, phase: 'pending', moved: false, ghost: null, pointerType: e.pointerType,
           scrollStartTop: null,
@@ -2621,6 +2862,8 @@
     document.addEventListener('pointermove', e => {
       const session = noteDragSession;
       if (!session || e.pointerId !== session.pointerId) return;
+      session.lastClientX = e.clientX;
+      session.lastClientY = e.clientY;
       const distance = Math.hypot(e.clientX - session.startX, e.clientY - session.startY);
       if (session.phase === 'pending') {
         if (distance > 18) {
@@ -2650,6 +2893,7 @@
       if (session.phase !== 'dragging') return;
       e.preventDefault();
       session.moved = session.moved || distance > 5;
+      if (session.note.pinned && session.moved) ensureNoteDragAutoScroll();
       if (session.ghost) {
         if (!session.isProtectedLocked && distance > 42) session.ghost.classList.add('compact');
         const compact = session.ghost.classList.contains('compact');
@@ -2672,9 +2916,11 @@
       if (!session || e.pointerId !== session.pointerId) return;
       clearNoteDragHold();
       if (session.phase !== 'dragging') {
+        stopNoteDragAutoScroll();
         noteDragSession = null;
         return;
       }
+      stopNoteDragAutoScroll();
 
       const dropX = e.clientX;
       const dropY = e.clientY;
@@ -2823,6 +3069,17 @@
       document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
       el.classList.add('active');
       renderNoteList();
+    }
+
+    function openNoteFromEmptyState() {
+      // Prefer the first note currently visible in the list (respects search/filter), then any stored note.
+      const firstVisibleCard = document.querySelector('#note-list .note-card[data-id]');
+      const targetId = firstVisibleCard?.dataset.id || decryptedNotes[0]?.id;
+      if (targetId) {
+        void selectNote(targetId);
+        return;
+      }
+      createNewNote();
     }
 
     function createNewNote(category = 'TEXT') {
